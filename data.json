@@ -11,6 +11,18 @@
       "nextReview": "2026-05-07",
       "lastReview": "2026-05-06",
       "active": true
+    },
+    {
+      "id": "d8bb112a-2d24-4440-990f-05e0d775a925",
+      "nombre": "U1",
+      "materia": "Investigación operativa",
+      "tag": "Investigación operativa",
+      "ef": 2.5,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": "2026-05-06",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

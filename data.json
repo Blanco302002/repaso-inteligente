@@ -35,6 +35,18 @@
       "nextReview": "2026-05-06",
       "lastReview": null,
       "active": true
+    },
+    {
+      "id": "00bc8576-3024-4807-952f-027c2b55e564",
+      "nombre": "U3",
+      "materia": "Investigación operativa",
+      "tag": "Investigación operativa",
+      "ef": 2.5,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": "2026-05-06",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

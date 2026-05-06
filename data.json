@@ -1,16 +1,3 @@
 {
-  "temas": [
-    {
-      "id": "46b149c6-4646-4e13-8deb-75ad1f40a48c",
-      "nombre": "cositas",
-      "materia": "cositas",
-      "tag": "College",
-      "ef": 2.5,
-      "interval": 1,
-      "repetitions": 0,
-      "nextReview": "2026-05-06",
-      "lastReview": null,
-      "active": true
-    }
-  ]
+  "temas": []
 }

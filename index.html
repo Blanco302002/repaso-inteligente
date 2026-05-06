@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repaso inteligente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0f0e0d;--ink2:#4a4845;--ink3:#9a9690;
+  --paper:#faf8f5;--paper2:#f0ede8;--paper3:#e4e0d8;
+  --accent:#1D9E75;--accent2:#0F6E56;--accent-bg:#E1F5EE;
+  --warn:#BA7517;--warn-bg:#FAEEDA;
+  --danger:#A32D2D;--danger-bg:#FCEBEB;
+  --purple:#534AB7;--purple-bg:#EEEDFE;
+  --serif:'DM Serif Display',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+  --r:10px;--r2:16px;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--paper);color:var(--ink)}
+
+/* ── SETUP SCREEN ── */
+#setup-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:var(--ink);
+}
+.setup-card{
+  background:var(--paper);border-radius:var(--r2);
+  padding:40px;max-width:440px;width:90%;
+}
+.setup-title{font-family:var(--serif);font-size:32px;line-height:1;margin-bottom:4px}
+.setup-title em{font-style:italic}
+.setup-sub{font-size:12px;color:var(--ink3);font-family:var(--mono);margin-bottom:28px;letter-spacing:.04em}
+.setup-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.setup-field label{font-size:10px;color:var(--ink3);font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase}
+.setup-field input{
+  padding:10px 12px;border:1px solid var(--paper3);border-radius:var(--r);
+  font-size:14px;font-family:var(--mono);background:var(--paper);color:var(--ink);outline:none;
+}
+.setup-field input:focus{border-color:var(--accent)}
+.setup-field .hint{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.5}
+.setup-field .hint a{color:var(--accent2)}
+.setup-btn{
+  width:100%;padding:11px;background:var(--ink);color:#faf8f5;
+  border:none;border-radius:var(--r);font-size:14px;font-family:var(--sans);
+  font-weight:500;cursor:pointer;margin-top:8px;
+}
+.setup-btn:hover{background:#2a2826}
+.setup-note{font-size:11px;color:var(--ink3);margin-top:14px;text-align:center;font-family:var(--mono);line-height:1.6}
+
+/* ── SHELL ── */
+#app{display:none;height:100vh;overflow:hidden}
+.shell{display:grid;grid-template-columns:210px 1fr;height:100vh}
+
+.sidebar{background:var(--ink);display:flex;flex-direction:column}
+.brand{padding:28px 24px 20px;border-bottom:1px solid #2a2826}
+.brand-name{font-family:var(--serif);font-size:20px;color:#faf8f5;line-height:1.1}
+.brand-name em{font-style:italic}
+.brand-sub{font-size:10px;color:#5a5855;letter-spacing:.08em;margin-top:4px;font-family:var(--mono)}
+.nav{padding:16px 0;flex:1}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 24px;
+  font-size:13px;color:#9a9690;cursor:pointer;transition:.15s;
+  border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{color:#faf8f5;background:#1a1917}
+.nav-item.active{color:#faf8f5;background:#1a1917}
+.nav-item.active .ndot{background:var(--accent)}
+.ndot{width:6px;height:6px;border-radius:50%;background:#3a3835;flex-shrink:0}
+.nbadge{margin-left:auto;font-family:var(--mono);font-size:11px;background:#1a1917;color:var(--accent);padding:2px 7px;border-radius:20px}
+.sidebar-footer{padding:16px 24px;border-top:1px solid #1a1917}
+.sync-status{font-size:10px;font-family:var(--mono);color:#4a4845;display:flex;align-items:center;gap:6px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#3a3835;flex-shrink:0}
+.sync-dot.ok{background:var(--accent)}
+.sync-dot.saving{background:var(--warn)}
+.sync-dot.err{background:var(--danger)}
+
+.main{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{padding:24px 32px 0;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.page-title{font-family:var(--serif);font-size:32px;line-height:1}
+.page-title em{font-style:italic}
+.page-sub{font-size:12px;color:var(--ink3);margin-top:6px;font-family:var(--mono)}
+.add-btn{
+  display:flex;align-items:center;gap:6px;padding:8px 16px;
+  background:var(--ink);color:#faf8f5;border:none;border-radius:var(--r);
+  font-size:13px;font-family:var(--sans);font-weight:500;cursor:pointer;margin-top:4px;
+}
+.add-btn:hover{background:#2a2826}
+.content{padding:20px 32px;flex:1;overflow-y:auto}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.stat-card{background:var(--paper2);border-radius:var(--r);padding:14px 16px;border:1px solid var(--paper3)}
+.stat-n{font-family:var(--serif);font-size:28px;line-height:1}
+.stat-n.accent{color:var(--accent2)}
+.stat-n.warn{color:var(--warn)}
+.stat-n.danger{color:var(--danger)}
+.stat-l{font-size:10px;color:var(--ink3);margin-top:4px;font-family:var(--mono);letter-spacing:.06em}
+
+.slabel{font-size:10px;font-weight:500;color:var(--ink3);letter-spacing:.12em;text-transform:uppercase;font-family:var(--mono);margin-bottom:12px}
+
+.due-list{display:flex;flex-direction:column;gap:8px}
+.tema-card{
+  background:var(--paper);border:1px solid var(--paper3);border-radius:var(--r);
+  padding:14px 16px;display:flex;align-items:center;gap:16px;
+}
+.tema-card.today{border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0}
+.tema-main{flex:1;min-width:0}
+.tema-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tema-meta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.mpill{font-size:11px;padding:2px 9px;border-radius:20px;font-family:var(--mono);font-weight:500}
+.tmeta{font-size:11px;color:var(--ink3);font-family:var(--mono)}
+.rate-row{display:flex;gap:5px;flex-shrink:0}
+.rb{padding:5px 11px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;border:1px solid;font-family:var(--sans)}
+.rb:active{transform:scale(.96)}
+.rb-0{background:var(--danger-bg);color:var(--danger);border-color:#f09595}
+.rb-1{background:var(--warn-bg);color:var(--warn);border-color:#fac775}
+.rb-2{background:var(--accent-bg);color:var(--accent2);border-color:#9FE1CB}
+.rb-3{background:var(--purple-bg);color:var(--purple);border-color:#AFA9EC}
+
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.fpill{padding:4px 12px;border-radius:20px;font-size:12px;border:1px solid var(--paper3);background:var(--paper2);color:var(--ink3);cursor:pointer;font-family:var(--mono)}
+.fpill.active{background:var(--ink);color:#faf8f5;border-color:var(--ink)}
+.all-list{display:flex;flex-direction:column;gap:6px}
+.all-card{background:var(--paper);border:1px solid var(--paper3);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.all-card.paused{opacity:.45}
+.all-name{font-size:14px;font-weight:500}
+.all-meta{font-size:11px;color:var(--ink3);margin-top:3px;font-family:var(--mono)}
+.bdge{font-size:11px;padding:2px 9px;border-radius:20px;font-family:var(--mono);font-weight:500;white-space:nowrap}
+.cbtn{padding:4px 10px;border:1px solid var(--paper3);border-radius:var(--r);font-size:12px;background:var(--paper2);color:var(--ink2);cursor:pointer;font-family:var(--sans)}
+.cbtn.del{border-color:#f09595;color:var(--danger);background:var(--danger-bg)}
+
+.form-wrap{display:flex;flex-direction:column;gap:14px;max-width:580px}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:10px;color:var(--ink3);font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase}
+.fg input,.fg select{
+  padding:9px 12px;border:1px solid var(--paper3);border-radius:var(--r);
+  font-size:14px;font-family:var(--sans);background:var(--paper);color:var(--ink);outline:none;
+}
+.fg input:focus,.fg select:focus{border-color:var(--accent)}
+.factions{display:flex;gap:8px;justify-content:flex-end;padding-top:4px}
+.btn-sec{padding:9px 18px;border:1px solid var(--paper3);border-radius:var(--r);font-size:13px;font-family:var(--sans);background:var(--paper2);color:var(--ink2);cursor:pointer}
+.btn-pri{padding:9px 22px;border:none;border-radius:var(--r);font-size:13px;font-family:var(--sans);background:var(--ink);color:#faf8f5;cursor:pointer;font-weight:500}
+.btn-pri:hover{background:#2a2826}
+
+.export-block{background:var(--ink);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.export-code{font-family:var(--mono);font-size:11px;color:#9FE1CB;word-break:break-all;white-space:pre-wrap;max-height:160px;overflow-y:auto}
+.exp-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.exp-btn{padding:7px 14px;border:1px solid var(--paper3);border-radius:var(--r);font-size:13px;background:var(--paper2);color:var(--ink);cursor:pointer;font-family:var(--sans)}
+.exp-btn.go{background:var(--ink);color:#faf8f5;border-color:var(--ink)}
+.things-steps{display:flex;flex-direction:column;gap:10px}
+.step{display:flex;gap:12px;align-items:flex-start}
+.snum{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#faf8f5;font-size:11px;font-family:var(--mono);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stext{font-size:13px;color:var(--ink2);line-height:1.6}
+.stext code{font-family:var(--mono);font-size:11px;background:var(--paper3);padding:1px 5px;border-radius:4px}
+
+.empty-state{text-align:center;padding:48px 20px;color:var(--ink3)}
+.empty-icon{font-size:32px;display:block;margin-bottom:10px;color:var(--accent)}
+.empty-title{font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:4px;font-style:italic}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#faf8f5;padding:10px 18px;border-radius:var(--r);font-size:13px;font-family:var(--mono);opacity:0;transition:.3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+
+@media(max-width:600px){
+  .shell{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{flex-direction:row;height:auto}
+  .brand{display:none}
+  .nav{display:flex;flex-direction:row;padding:0;overflow-x:auto}
+  .nav-item{padding:12px 14px;flex-direction:column;gap:2px;font-size:10px;align-items:center}
+  .ndot{display:none}
+  .nbadge{margin:0}
+  .sidebar-footer{display:none}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .frow2,.frow3{grid-template-columns:1fr}
+  .rate-row{flex-wrap:wrap}
+  .topbar{padding:14px 16px 0}
+  .content{padding:14px 16px}
+  .main{height:calc(100vh - 58px)}
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-title">Repaso<br><em>inteligente</em></div>
+    <div class="setup-sub">CONFIGURACIÓN INICIAL · UNA SOLA VEZ</div>
+
+    <div class="setup-field">
+      <label>Tu usuario de GitHub</label>
+      <input type="text" id="cfg-user" placeholder="tu-usuario">
+    </div>
+    <div class="setup-field">
+      <label>Nombre del repositorio</label>
+      <input type="text" id="cfg-repo" placeholder="repaso-inteligente">
+    </div>
+    <div class="setup-field">
+      <label>Personal Access Token</label>
+      <input type="password" id="cfg-token" placeholder="ghp_xxxxxxxxxxxx">
+      <div class="hint">
+        Generalo en <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a>
+        → "Fine-grained token" → solo permiso <strong>Contents: Read &amp; Write</strong> en este repo.
+        Se guarda solo en este navegador.
+      </div>
+    </div>
+
+    <button class="setup-btn" onclick="saveConfig()">Guardar y entrar →</button>
+    <div class="setup-note">
+      El token se guarda en localStorage de tu navegador.<br>
+      Nunca sale de tu dispositivo salvo para llamar a la API de GitHub.
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-name">Repaso<br><em>inteligente</em></div>
+        <div class="brand-sub">SM-2 × THINGS 3</div>
+      </div>
+      <nav class="nav">
+        <button class="nav-item active" onclick="showTab('hoy',this)">
+          <span class="ndot"></span>Hoy<span class="nbadge" id="nav-count">0</span>
+        </button>
+        <button class="nav-item" onclick="showTab('temas',this)">
+          <span class="ndot"></span>Temas
+        </button>
+        <button class="nav-item" onclick="showTab('nuevo',this)">
+          <span class="ndot"></span>Agregar
+        </button>
+        <button class="nav-item" onclick="showTab('things',this)">
+          <span class="ndot"></span>Things
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sync-status">
+          <span class="sync-dot" id="sync-dot"></span>
+          <span id="sync-label">listo</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- HOY -->
+      <div id="tab-hoy" style="display:flex;flex-direction:column;height:100%">
+        <div class="topbar">
+          <div>
+            <div class="page-title">Para <em>estudiar</em></div>
+            <div class="page-sub" id="hoy-sub"></div>
+          </div>
+          <button class="add-btn" onclick="showTab('nuevo',document.querySelectorAll('.nav-item')[2])">+ Agregar</button>
+        </div>
+        <div class="content">
+          <div class="stats-row" id="stats"></div>
+          <div class="slabel">Repasar hoy</div>
+          <div class="due-list" id="due-list"><div style="color:var(--ink3);font-family:var(--mono);font-size:13px;padding:20px 0">cargando...</div></div>
+        </div>
+      </div>
+
+      <!-- TEMAS -->
+      <div id="tab-temas" style="display:none;flex-direction:column;height:100%">
+        <div class="topbar">
+          <div>
+            <div class="page-title"><em>Todos</em> los temas</div>
+            <div class="page-sub" id="temas-sub"></div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="filter-row" id="filters"></div>
+          <div class="all-list" id="all-list"></div>
+        </div>
+      </div>
+
+      <!-- NUEVO -->
+      <div id="tab-nuevo" style="display:none;flex-direction:column;height:100%">
+        <div class="topbar">
+          <div>
+            <div class="page-title"><em>Nuevo</em> tema</div>
+            <div class="page-sub">Cargá un tema para empezar a repasarlo</div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="form-wrap">
+            <div class="frow2">
+              <div class="fg"><label>Nombre del tema</label><input type="text" id="inp-tema" placeholder="Ej: Derivadas parciales"></div>
+              <div class="fg"><label>Materia</label><input type="text" id="inp-mat" placeholder="Ej: Cálculo" list="mat-list"><datalist id="mat-list"></datalist></div>
+            </div>
+            <div class="frow3">
+              <div class="fg">
+                <label>Estado inicial</label>
+                <select id="inp-estado">
+                  <option value="nuevo">Nuevo — nunca lo vi</option>
+                  <option value="flojo">Flojo — lo vi poco</option>
+                  <option value="regular">Regular — más o menos</option>
+                  <option value="bien">Bien — lo sé</option>
+                </select>
+              </div>
+              <div class="fg"><label>Primer repaso</label><input type="date" id="inp-fecha"></div>
+              <div class="fg"><label>Etiqueta en Things</label><input type="text" id="inp-tag" placeholder="Ej: Estudio"></div>
+            </div>
+            <div class="factions">
+              <button class="btn-sec" onclick="clearForm()">Limpiar</button>
+              <button class="btn-pri" onclick="addTema()">+ Agregar tema</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THINGS -->
+      <div id="tab-things" style="display:none;flex-direction:column;height:100%">
+        <div class="topbar">
+          <div>
+            <div class="page-title">Things <em>&amp;</em> Shortcut</div>
+            <div class="page-sub">Automatizá tus repasos en iPhone</div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="slabel" style="margin-bottom:10px">Abrir temas de hoy en Things</div>
+          <div class="exp-row">
+            <button class="exp-btn go" onclick="openThings()">↗ Abrir en Things 3</button>
+          </div>
+          <div class="slabel" style="margin-bottom:10px">JSON para Shortcut automático</div>
+          <div class="export-block"><div class="export-code" id="json-out"></div></div>
+          <div class="exp-row">
+            <button class="exp-btn" onclick="copyJSON()">Copiar JSON</button>
+            <button class="exp-btn" onclick="dlJSON()">Descargar</button>
+          </div>
+          <div class="slabel" style="margin-bottom:10px">Cómo armar el Shortcut</div>
+          <div class="things-steps">
+            <div class="step"><div class="snum">1</div><div class="stext">Abrí <strong>Shortcuts</strong> en iPhone → nuevo shortcut.</div></div>
+            <div class="step"><div class="snum">2</div><div class="stext">Acción <strong>"Obtener contenido de URL"</strong> → <code id="data-url"></code></div></div>
+            <div class="step"><div class="snum">3</div><div class="stext">Acción <strong>"Repetir"</strong> sobre el campo <code>temas</code>.</div></div>
+            <div class="step"><div class="snum">4</div><div class="stext">Dentro del loop → acción <strong>"URL"</strong>: <code>things:///add?title=[nombre]&when=today&tags=[materia]</code></div></div>
+            <div class="step"><div class="snum">5</div><div class="stext">Acción <strong>"Abrir URLs"</strong> — Things crea cada tarea.</div></div>
+            <div class="step"><div class="snum">6</div><div class="stext"><strong>Automatización</strong> → hora del día (ej. 7:00 AM) → ejecutar este shortcut.</div></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const CFG_KEY = 'ri_config'
+let cfg = null
+
+function loadConfig() {
+  try { cfg = JSON.parse(localStorage.getItem(CFG_KEY)) } catch(e) {}
+  return !!(cfg?.user && cfg?.repo && cfg?.token)
+}
+
+function saveConfig() {
+  const user  = document.getElementById('cfg-user').value.trim()
+  const repo  = document.getElementById('cfg-repo').value.trim()
+  const token = document.getElementById('cfg-token').value.trim()
+  if (!user || !repo || !token) { toast('Completá todos los campos'); return }
+  cfg = { user, repo, token }
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg))
+  bootApp()
+}
+
+// ── GITHUB API ──
+const FILE_PATH = 'data.json'
+let fileSha = null
+
+async function ghGet() {
+  const url = `https://api.github.com/repos/${cfg.user}/${cfg.repo}/contents/${FILE_PATH}`
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${cfg.token}`, Accept: 'application/vnd.github+json' } })
+  if (r.status === 404) return null
+  if (!r.ok) throw new Error('Error leyendo datos')
+  const json = await r.json()
+  fileSha = json.sha
+  return JSON.parse(atob(json.content.replace(/\n/g,'')))
+}
+
+async function ghPut(data) {
+  setSyncStatus('saving')
+  const url = `https://api.github.com/repos/${cfg.user}/${cfg.repo}/contents/${FILE_PATH}`
+  const body = { message: 'repaso: sync', content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))) }
+  if (fileSha) body.sha = fileSha
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${cfg.token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+  if (!r.ok) { setSyncStatus('err'); throw new Error('Error guardando') }
+  const json = await r.json()
+  fileSha = json.content.sha
+  setSyncStatus('ok')
+}
+
+// ── STATE ──
+let temas = []
+let filt  = 'todos'
+const COLORS = [
+  ['#E1F5EE','#0F6E56'],['#EEEDFE','#3C3489'],['#FAECE7','#712B13'],
+  ['#FBEAF0','#72243E'],['#E6F1FB','#0C447C'],['#EAF3DE','#27500A'],
+  ['#FAEEDA','#633806'],['#FCEBEB','#791F1F']
+]
+
+// ── BOOT ──
+async function bootApp() {
+  document.getElementById('setup-screen').style.display = 'none'
+  document.getElementById('app').style.display = 'block'
+  setSyncStatus('saving')
+  try {
+    const data = await ghGet()
+    temas = data?.temas || []
+  } catch(e) {
+    toast('Error conectando con GitHub')
+    setSyncStatus('err')
+    return
+  }
+  setSyncStatus('ok')
+  refresh()
+  document.getElementById('inp-fecha').value = today()
+  const dataUrl = `https://raw.githubusercontent.com/${cfg.user}/${cfg.repo}/main/${FILE_PATH}`
+  document.getElementById('data-url').textContent = dataUrl
+}
+
+// ── SYNC ──
+function setSyncStatus(s) {
+  const dot = document.getElementById('sync-dot')
+  const lbl = document.getElementById('sync-label')
+  dot.className = 'sync-dot ' + s
+  lbl.textContent = s === 'ok' ? 'sincronizado' : s === 'saving' ? 'guardando...' : 'error al guardar'
+}
+
+async function persist() {
+  try { await ghPut({ temas }) }
+  catch(e) { toast('No se pudo guardar — revisá el token') }
+}
+
+// ── HELPERS ──
+function fmt(d) { return d.toISOString().split('T')[0] }
+function today() { return fmt(new Date()) }
+function daysUntil(s) {
+  const d=new Date(s), n=new Date()
+  n.setHours(0,0,0,0); d.setHours(0,0,0,0)
+  return Math.round((d-n)/86400000)
+}
+function matColor(mat) {
+  const ms = [...new Set(temas.map(t=>t.materia))]
+  return COLORS[ms.indexOf(mat) % COLORS.length]
+}
+function toast(msg) {
+  const el=document.getElementById('toast')
+  el.textContent=msg; el.classList.add('show')
+  setTimeout(()=>el.classList.remove('show'),2600)
+}
+
+// ── SM-2 ──
+function sm2(t, q) {
+  let {interval, repetitions, ef} = t
+  if (q < 1) { repetitions=0; interval=1 }
+  else {
+    if (repetitions===0) interval=1
+    else if (repetitions===1) interval=6
+    else interval=Math.round(interval*ef)
+    repetitions++
+    ef=Math.max(1.3, ef+0.1-(3-q)*(0.08+(3-q)*0.02))
+  }
+  const next=new Date(); next.setDate(next.getDate()+interval)
+  return {interval, repetitions, ef:Math.round(ef*100)/100, nextReview:fmt(next)}
+}
+
+// ── ACTIONS ──
+async function addTema() {
+  const nombre  = document.getElementById('inp-tema').value.trim()
+  const materia = document.getElementById('inp-mat').value.trim()
+  const estado  = document.getElementById('inp-estado').value
+  const fecha   = document.getElementById('inp-fecha').value || today()
+  const tag     = document.getElementById('inp-tag').value.trim()
+  if (!nombre || !materia) { toast('Completá nombre y materia'); return }
+  const efMap  = {nuevo:2.5, flojo:1.6, regular:2.0, bien:2.8}
+  const intMap = {nuevo:1,   flojo:1,   regular:3,   bien:7}
+  temas.push({
+    id: crypto.randomUUID(), nombre, materia, tag: tag||materia,
+    ef: efMap[estado], interval: intMap[estado], repetitions: 0,
+    nextReview: fecha, lastReview: null, active: true
+  })
+  await persist()
+  clearForm()
+  showTab('hoy', document.querySelectorAll('.nav-item')[0])
+  refresh(); toast('Tema agregado')
+}
+
+function clearForm() {
+  ['inp-tema','inp-mat','inp-tag'].forEach(id=>document.getElementById(id).value='')
+  document.getElementById('inp-estado').value='nuevo'
+  document.getElementById('inp-fecha').value=today()
+}
+
+async function rate(id, q) {
+  const i=temas.findIndex(t=>t.id===id); if(i<0)return
+  const res=sm2(temas[i], q)
+  Object.assign(temas[i], res, {lastReview:today()})
+  await persist(); refresh()
+  const msgs=['Mañana lo repasamos','Intervalo reducido',`Próximo en ${res.interval} días`,`Perfecto · en ${res.interval} días`]
+  toast(msgs[q])
+}
+
+async function delTema(id) {
+  if (!confirm('¿Eliminar este tema?')) return
+  temas=temas.filter(t=>t.id!==id)
+  await persist(); refresh()
+}
+
+async function toggleActive(id) {
+  const t=temas.find(t=>t.id===id); if(!t)return
+  t.active=!t.active
+  await persist(); refresh()
+}
+
+// ── RENDER ──
+function refresh() {
+  renderStats(); renderDue(); renderAll()
+  renderFilters(); renderMats(); renderJSON()
+  document.getElementById('nav-count').textContent =
+    temas.filter(t=>t.active&&t.nextReview<=today()).length
+}
+
+function renderStats() {
+  const due   = temas.filter(t=>t.active&&t.nextReview<=today()).length
+  const total = temas.filter(t=>t.active).length
+  const mats  = new Set(temas.filter(t=>t.active).map(t=>t.materia)).size
+  const week  = temas.filter(t=>t.active&&daysUntil(t.nextReview)>0&&daysUntil(t.nextReview)<=7).length
+  document.getElementById('stats').innerHTML=`
+    <div class="stat-card"><div class="stat-n danger">${due}</div><div class="stat-l">PARA HOY</div></div>
+    <div class="stat-card"><div class="stat-n warn">${week}</div><div class="stat-l">ESTA SEMANA</div></div>
+    <div class="stat-card"><div class="stat-n">${total}</div><div class="stat-l">ACTIVOS</div></div>
+    <div class="stat-card"><div class="stat-n accent">${mats}</div><div class="stat-l">MATERIAS</div></div>`
+  document.getElementById('hoy-sub').textContent=
+    `${due} tema${due!==1?'s':''} pendiente${due!==1?'s':''} · ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}`
+}
+
+function renderDue() {
+  const due=temas.filter(t=>t.active&&t.nextReview<=today())
+  const el=document.getElementById('due-list')
+  if(!due.length){
+    el.innerHTML=`<div class="empty-state"><span class="empty-icon">✓</span><div class="empty-title">Todo al día</div><div class="empty-sub">No hay temas pendientes para hoy.</div></div>`
+    return
+  }
+  el.innerHTML=due.map(t=>{
+    const [bg,fg]=matColor(t.materia)
+    return`<div class="tema-card today">
+      <div class="tema-main">
+        <div class="tema-name">${t.nombre}</div>
+        <div class="tema-meta">
+          <span class="mpill" style="background:${bg};color:${fg}">${t.materia}</span>
+          <span class="tmeta">Int: ${t.interval}d · Rep: ${t.repetitions} · EF: ${t.ef}</span>
+        </div>
+      </div>
+      <div class="rate-row">
+        <button class="rb rb-0" onclick="rate('${t.id}',0)">Olvidé</button>
+        <button class="rb rb-1" onclick="rate('${t.id}',1)">Flojo</button>
+        <button class="rb rb-2" onclick="rate('${t.id}',2)">Bien</button>
+        <button class="rb rb-3" onclick="rate('${t.id}',3)">Perfecto</button>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function renderAll() {
+  const filtered=filt==='todos'?temas:temas.filter(t=>t.materia===filt)
+  const sorted=[...filtered].sort((a,b)=>a.nextReview.localeCompare(b.nextReview))
+  document.getElementById('temas-sub').textContent=`${filtered.length} tema${filtered.length!==1?'s':''}`
+  const el=document.getElementById('all-list')
+  if(!sorted.length){el.innerHTML=`<div class="empty-state"><div class="empty-title">Sin temas</div><div class="empty-sub">Agregá el primero.</div></div>`;return}
+  el.innerHTML=sorted.map(t=>{
+    const [bg,fg]=matColor(t.materia)
+    const days=daysUntil(t.nextReview)
+    let dbg,dfg,dtxt
+    if(!t.active){dbg='#f0ede8';dfg='#9a9690';dtxt='pausado'}
+    else if(days<=0){dbg='#FCEBEB';dfg='#A32D2D';dtxt='hoy'}
+    else if(days<=3){dbg='#FAEEDA';dfg='#BA7517';dtxt=`${days}d`}
+    else{dbg='#E1F5EE';dfg='#0F6E56';dtxt=`${days}d`}
+    return`<div class="all-card ${t.active?'':'paused'}">
+      <div style="flex:1;min-width:0">
+        <div class="all-name">${t.nombre}</div>
+        <div class="all-meta"><span class="mpill" style="background:${bg};color:${fg};font-size:10px;padding:1px 7px">${t.materia}</span> · próximo: ${t.nextReview} · ef: ${t.ef}</div>
+      </div>
+      <span class="bdge" style="background:${dbg};color:${dfg}">${dtxt}</span>
+      <button class="cbtn" onclick="toggleActive('${t.id}')">${t.active?'Pausar':'Activar'}</button>
+      <button class="cbtn del" onclick="delTema('${t.id}')">✕</button>
+    </div>`
+  }).join('')
+}
+
+function renderFilters() {
+  const mats=[...new Set(temas.map(t=>t.materia))]
+  document.getElementById('filters').innerHTML=
+    `<button class="fpill ${filt==='todos'?'active':''}" onclick="setFilt('todos',this)">todos</button>`+
+    mats.map(m=>`<button class="fpill ${filt===m?'active':''}" onclick="setFilt('${m}',this)">${m}</button>`).join('')
+}
+
+function setFilt(s,btn){
+  filt=s
+  document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('active'))
+  btn.classList.add('active'); renderAll()
+}
+
+function renderMats() {
+  const mats=[...new Set(temas.map(t=>t.materia))]
+  document.getElementById('mat-list').innerHTML=mats.map(m=>`<option value="${m}">`).join('')
+}
+
+function renderJSON() {
+  const due=temas.filter(t=>t.active&&t.nextReview<=today())
+  document.getElementById('json-out').textContent=JSON.stringify({
+    fecha:today(),
+    temas:due.map(t=>({nombre:t.nombre,materia:t.materia,tag:t.tag||t.materia}))
+  },null,2)
+}
+
+function openThings() {
+  const due=temas.filter(t=>t.active&&t.nextReview<=today())
+  if(!due.length){toast('No hay temas para hoy');return}
+  due.forEach(t=>window.open(`things:///add?title=${encodeURIComponent('📚 '+t.nombre)}&when=today&tags=${encodeURIComponent(t.materia)}`))
+}
+
+function copyJSON(){navigator.clipboard.writeText(document.getElementById('json-out').textContent).then(()=>toast('JSON copiado'))}
+function dlJSON(){const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(document.getElementById('json-out').textContent);a.download=`repaso_${today()}.json`;a.click()}
+
+// ── TABS ──
+function showTab(id, btn) {
+  ['hoy','temas','nuevo','things'].forEach(t=>{
+    const el=document.getElementById('tab-'+t)
+    el.style.display=t===id?'flex':'none'
+    if(t===id)el.style.flexDirection='column'
+  })
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'))
+  if(btn)btn.classList.add('active')
+}
+
+// ── INIT ──
+if (loadConfig()) {
+  bootApp()
+} else {
+  document.getElementById('setup-screen').style.display = 'flex'
+}
+</script>
+</body>
+</html>

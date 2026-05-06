@@ -1,3 +1,16 @@
 {
-  "temas": []
+  "temas": [
+    {
+      "id": "41ca80f8-273d-47e4-b3dc-538cd20b41eb",
+      "nombre": "Calculo",
+      "materia": "Collage",
+      "tag": "Simulation",
+      "ef": 2.5,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": "2026-05-06",
+      "lastReview": null,
+      "active": true
+    }
+  ]
 }

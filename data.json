@@ -7,9 +7,9 @@
       "tag": "Ingeniería y calidad de SW",
       "ef": 2.5,
       "interval": 1,
-      "repetitions": 0,
-      "nextReview": "2026-05-06",
-      "lastReview": null,
+      "repetitions": 1,
+      "nextReview": "2026-05-07",
+      "lastReview": "2026-05-06",
       "active": true
     }
   ]

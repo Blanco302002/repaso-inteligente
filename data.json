@@ -47,6 +47,18 @@
       "nextReview": "2026-05-06",
       "lastReview": null,
       "active": true
+    },
+    {
+      "id": "7df6f3cf-5efb-48af-a5b7-f1b083608847",
+      "nombre": "Dieléctricos en capacitores",
+      "materia": "Física 2",
+      "tag": "Física 2",
+      "ef": 2.5,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": "2026-05-06",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

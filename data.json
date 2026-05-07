@@ -18,10 +18,10 @@
       "materia": "FÃ­sica 2",
       "tag": "FÃ­sica 2",
       "ef": 2.5,
-      "interval": 1,
-      "repetitions": 1,
-      "nextReview": "2026-05-07",
-      "lastReview": "2026-05-06",
+      "interval": 6,
+      "repetitions": 2,
+      "nextReview": "2026-05-13",
+      "lastReview": "2026-05-07",
       "active": true
     }
   ]

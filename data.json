@@ -25,18 +25,6 @@
       "active": true
     },
     {
-      "id": "00bc8576-3024-4807-952f-027c2b55e564",
-      "nombre": "U3",
-      "materia": "InvestigaciÃ³n operativa",
-      "tag": "InvestigaciÃ³n operativa",
-      "ef": 2.5,
-      "interval": 1,
-      "repetitions": 0,
-      "nextReview": "2026-05-06",
-      "lastReview": null,
-      "active": true
-    },
-    {
       "id": "7df6f3cf-5efb-48af-a5b7-f1b083608847",
       "nombre": "DielÃ©ctricos en capacitores",
       "materia": "FÃ­sica 2",

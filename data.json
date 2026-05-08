@@ -76,6 +76,17 @@
       "nextReview": "2026-05-09",
       "lastReview": "2026-05-08",
       "active": true
+    },
+    {
+      "id": "4aa39eec-6d3d-421b-b0df-df3862a5c493",
+      "nombre": "Capacitores definiciones, ejemplo esfera y cilindro",
+      "materia": "Física 2",
+      "ef": 2,
+      "interval": 3,
+      "repetitions": 0,
+      "nextReview": "2026-05-08",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

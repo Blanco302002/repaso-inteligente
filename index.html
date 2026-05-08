@@ -62,14 +62,14 @@
         <button class="nav-item" onclick="showTab('temas',this)">
           <span class="ndot"></span>Temas
         </button>
+        <button class="nav-item" onclick="showTab('calendario',this)">
+          <span class="ndot"></span>Calendario
+        </button>
         <button class="nav-item" onclick="showTab('nuevo',this)">
           <span class="ndot"></span>Agregar
         </button>
         <button class="nav-item" onclick="showTab('things',this)">
           <span class="ndot"></span>Things
-        </button>
-        <button class="nav-item" onclick="showTab('calendario',this)">
-          <span class="ndot"></span>Calendario
         </button>
       </nav>
       <div class="sidebar-footer">
@@ -89,7 +89,7 @@
             <div class="page-title">Para <em>estudiar</em></div>
             <div class="page-sub" id="hoy-sub"></div>
           </div>
-          <button class="add-btn" onclick="showTab('nuevo',document.querySelectorAll('.nav-item')[2])">+ Agregar</button>
+          <button class="add-btn" onclick="showTab('nuevo',document.querySelector('[onclick*=\'nuevo\']'))">+ Agregar</button>
         </div>
         <div class="content">
           <div class="stats-row" id="stats"></div>
@@ -233,6 +233,7 @@
   </div>
 </div>
 
+<div class="cal-tooltip" id="cal-tooltip"></div>
 <div class="toast" id="toast"></div>
 
 <script src="js/state.js"></script>

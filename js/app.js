@@ -30,7 +30,7 @@ async function addTema() {
   })
   await persist()
   clearForm()
-  showTab('hoy', document.querySelectorAll('.nav-item')[0])
+  showTab('hoy', document.querySelectorAll('.nav-item')[0]) // índice 0 = Hoy
   refresh()
   toast('Tema agregado')
 }

@@ -1,18 +1,6 @@
 {
   "temas": [
     {
-      "id": "27bf127a-eb82-4e49-b01f-403cb03238c2",
-      "nombre": "Gestion de configuraciÃ³n de SW",
-      "materia": "IngenierÃ­a y calidad de SW",
-      "tag": "IngenierÃ­a y calidad de SW",
-      "ef": 2.5,
-      "interval": 6,
-      "repetitions": 2,
-      "nextReview": "2026-05-13",
-      "lastReview": "2026-05-07",
-      "active": true
-    },
-    {
       "id": "7df6f3cf-5efb-48af-a5b7-f1b083608847",
       "nombre": "DielÃ©ctricos en capacitores",
       "materia": "FÃ­sica 2",

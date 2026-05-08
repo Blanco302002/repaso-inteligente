@@ -54,6 +54,17 @@
       "nextReview": "2026-05-10",
       "lastReview": "2026-05-08",
       "active": true
+    },
+    {
+      "id": "75f20f07-4193-4acc-98fb-52433b65b412",
+      "nombre": "Proceso y Modelos",
+      "materia": "Ingeniería y calidad de SW",
+      "ef": 2,
+      "interval": 3,
+      "repetitions": 0,
+      "nextReview": "2026-05-11",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

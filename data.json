@@ -1,3 +1,15 @@
 {
-  "temas": []
+  "temas": [
+    {
+      "id": "a91ff4eb-e620-4617-be54-f1a2ca47ddcd",
+      "nombre": "Dieléctricos",
+      "materia": "Física 2",
+      "ef": 2.5,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": "2026-05-08",
+      "lastReview": null,
+      "active": true
+    }
+  ]
 }

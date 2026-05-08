@@ -50,12 +50,10 @@ function renderThings() {
 
 function saveThingsEmail() {
   const email = document.getElementById('things-email-input').value.trim()
-  if (cfg) {
-    cfg.thingsEmail = email
-    localStorage.setItem(CFG_KEY, JSON.stringify(cfg))
-    renderThings()
-    toast('Correo guardado')
-  }
+  cfg.thingsEmail = email
+  localStorage.setItem(THINGS_EMAIL_KEY, email)
+  renderThings()
+  toast('Correo guardado')
 }
 
 function sendAllThingsEmails() {

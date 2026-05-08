@@ -1,13 +1,13 @@
 async function bootApp() {
-  document.getElementById('setup-screen').style.display = 'none'
+  document.getElementById('auth-screen').style.display = 'none'
   document.getElementById('app').style.display = 'block'
   setSyncStatus('saving')
   try {
-    const data = await ghGet()
-    temas     = data?.temas     || []
-    historial = data?.historial || []
+    const data = await sbGet()
+    temas     = data.temas     || []
+    historial = data.historial || []
   } catch(e) {
-    toast('Error conectando con GitHub')
+    toast('Error conectando con Supabase')
     setSyncStatus('err')
     return
   }
@@ -48,13 +48,13 @@ async function rate(id, q) {
   const t   = temas[i]
   const res = sm2(t, q)
 
-  // Registrar en historial
   historial.push({
-    date:    today(),
-    temaId:  id,
-    nombre:  t.nombre,
-    materia: t.materia,
-    quality: q,
+    id:       crypto.randomUUID(),
+    date:     today(),
+    temaId:   id,
+    nombre:   t.nombre,
+    materia:  t.materia,
+    quality:  q,
     interval: res.interval
   })
 
@@ -128,8 +128,4 @@ async function saveEdit() {
 }
 
 // ── INIT ──
-if (loadConfig()) {
-  bootApp()
-} else {
-  document.getElementById('setup-screen').style.display = 'flex'
-}
+initAuth()

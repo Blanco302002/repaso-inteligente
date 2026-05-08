@@ -201,6 +201,30 @@ html,body{height:100%;font-family:var(--sans);background:var(--paper);color:var(
 .mat-bar-track{flex:1;height:6px;background:var(--paper3);border-radius:3px;overflow:hidden}
 .mat-bar-fill{height:100%;border-radius:3px;transition:width .4s}
 
+/* ── AUTH SCREEN ── */
+#auth-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:var(--ink);
+}
+.auth-tabs{
+  display:flex;gap:0;margin-bottom:20px;
+  border-bottom:1px solid var(--paper3);
+}
+.auth-tab{
+  background:none;border:none;border-bottom:2px solid transparent;
+  cursor:pointer;font-family:var(--mono);font-size:11px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--ink3);padding:6px 16px 10px;margin-bottom:-1px;
+  transition:color .15s,border-color .15s;
+}
+.auth-tab.active{color:var(--ink);border-bottom-color:var(--ink)}
+.logout-btn{
+  display:block;width:100%;margin-top:10px;padding:6px;
+  background:none;border:1px solid #2a2826;border-radius:6px;
+  cursor:pointer;font-family:var(--mono);font-size:10px;text-transform:uppercase;
+  letter-spacing:.08em;color:#4a4845;transition:color .15s,border-color .15s;
+}
+.logout-btn:hover{color:#9a9690;border-color:#4a4845}
+
 @media(max-width:600px){
   .shell{grid-template-columns:1fr;grid-template-rows:auto 1fr}
   .sidebar{flex-direction:row;height:auto}

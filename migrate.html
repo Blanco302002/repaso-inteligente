@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migrar datos — Repaso inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0f0e0d;color:#faf8f5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:#faf8f5;color:#0f0e0d;border-radius:16px;padding:40px;max-width:520px;width:100%}
+h1{font-family:'DM Sans',sans-serif;font-size:20px;font-weight:500;margin-bottom:6px}
+.sub{font-family:'DM Mono',monospace;font-size:11px;color:#9a9690;letter-spacing:.04em;margin-bottom:28px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+label{font-size:10px;color:#9a9690;font-family:'DM Mono',monospace;letter-spacing:.07em;text-transform:uppercase}
+input,textarea{padding:10px 12px;border:1px solid #e4e0d8;border-radius:10px;font-size:13px;font-family:'DM Mono',monospace;background:#faf8f5;color:#0f0e0d;outline:none;resize:vertical}
+input:focus,textarea:focus{border-color:#1D9E75}
+.btn{width:100%;padding:11px;background:#0f0e0d;color:#faf8f5;border:none;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;margin-top:8px}
+.btn:hover{background:#2a2826}
+.btn:disabled{opacity:.4;cursor:default}
+.log{margin-top:20px;font-family:'DM Mono',monospace;font-size:12px;background:#f0ede8;border-radius:10px;padding:16px;line-height:1.8;white-space:pre-wrap;display:none}
+.log.show{display:block}
+.ok{color:#0F6E56}.err{color:#A32D2D}.info{color:#4a4845}
+#step2{display:none}
+.userid-box{background:#E1F5EE;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-family:'DM Mono',monospace;font-size:12px;color:#0F6E56;line-height:1.6}
+.userid-box strong{font-size:13px;display:block;margin-top:4px;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Migrar datos a Supabase</h1>
+  <p class="sub">EJECUTAR UNA SOLA VEZ · IMPORTA TU data.json</p>
+
+  <!-- Paso 1: login -->
+  <div id="step1">
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="mig-email" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')migrateLogin()">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="mig-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')migrateLogin()">
+    </div>
+    <button class="btn" id="btn-login" onclick="migrateLogin()">Iniciar sesión →</button>
+  </div>
+
+  <!-- Paso 2: migración -->
+  <div id="step2">
+    <div class="userid-box">
+      Logueado como: <span id="mig-user-email"></span>
+      <strong id="mig-user-id"></strong>
+      <span style="font-size:11px;color:#0F6E56;opacity:.8">↑ Guardá este ID como secret SUPABASE_USER_ID en GitHub</span>
+    </div>
+    <div class="field">
+      <label>Contenido de data.json</label>
+      <textarea id="mig-data" rows="10" placeholder='Pegá el contenido de tu data.json acá...&#10;{"temas":[...],"historial":[]}'></textarea>
+    </div>
+    <button class="btn" id="btn-migrate" onclick="migrateData()">Importar datos →</button>
+    <button class="btn" style="background:none;color:#9a9690;border:1px solid #e4e0d8;margin-top:6px" onclick="migrateLogout()">Cerrar sesión</button>
+  </div>
+
+  <div class="log" id="mig-log"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<script>
+function log(msg, type='info') {
+  const el = document.getElementById('mig-log')
+  el.classList.add('show')
+  el.innerHTML += `<span class="${type}">${msg}</span>\n`
+  el.scrollTop = el.scrollHeight
+}
+
+async function migrateLogin() {
+  const email    = document.getElementById('mig-email').value.trim()
+  const password = document.getElementById('mig-password').value
+  if (!email || !password) { log('Completá email y contraseña', 'err'); return }
+
+  const btn = document.getElementById('btn-login')
+  btn.disabled = true; btn.textContent = 'Ingresando...'
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) {
+    log('Error: ' + error.message, 'err')
+    btn.disabled = false; btn.textContent = 'Iniciar sesión →'
+    return
+  }
+
+  document.getElementById('step1').style.display = 'none'
+  document.getElementById('step2').style.display = 'block'
+  document.getElementById('mig-user-email').textContent = data.user.email
+  document.getElementById('mig-user-id').textContent    = data.user.id
+  log('Sesión iniciada correctamente.', 'ok')
+}
+
+async function migrateLogout() {
+  await supabase.auth.signOut()
+  document.getElementById('step1').style.display = 'block'
+  document.getElementById('step2').style.display = 'none'
+  document.getElementById('mig-log').innerHTML = ''
+  document.getElementById('mig-log').classList.remove('show')
+  document.getElementById('btn-login').disabled = false
+  document.getElementById('btn-login').textContent = 'Iniciar sesión →'
+}
+
+async function migrateData() {
+  const raw = document.getElementById('mig-data').value.trim()
+  if (!raw) { log('Pegá el contenido de data.json primero', 'err'); return }
+
+  let data
+  try { data = JSON.parse(raw) } catch(e) { log('JSON inválido: ' + e.message, 'err'); return }
+
+  const temas     = data.temas     || []
+  const historial = data.historial || []
+
+  if (!temas.length && !historial.length) {
+    log('El archivo no tiene temas ni historial.', 'err'); return
+  }
+
+  const btn = document.getElementById('btn-migrate')
+  btn.disabled = true; btn.textContent = 'Importando...'
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) { log('No autenticado', 'err'); btn.disabled = false; return }
+
+  log(`Importando ${temas.length} tema(s) y ${historial.length} entrada(s) de historial...`)
+
+  // Limpiar datos existentes del usuario
+  const { error: delT } = await supabase.from('temas').delete().eq('user_id', user.id)
+  if (delT) { log('Error borrando temas previos: ' + delT.message, 'err'); btn.disabled = false; return }
+  const { error: delH } = await supabase.from('historial').delete().eq('user_id', user.id)
+  if (delH) { log('Error borrando historial previo: ' + delH.message, 'err'); btn.disabled = false; return }
+
+  // Insertar temas
+  if (temas.length > 0) {
+    const rows = temas.map(t => ({
+      id:          t.id || crypto.randomUUID(),
+      user_id:     user.id,
+      nombre:      t.nombre,
+      materia:     t.materia,
+      ef:          t.ef,
+      interval:    t.interval,
+      repetitions: t.repetitions,
+      next_review: t.nextReview,
+      last_review: t.lastReview || null,
+      active:      t.active
+    }))
+    const { error } = await supabase.from('temas').insert(rows)
+    if (error) { log('Error insertando temas: ' + error.message, 'err'); btn.disabled = false; return }
+    log(`✓ ${temas.length} tema(s) importado(s)`, 'ok')
+  }
+
+  // Insertar historial
+  if (historial.length > 0) {
+    const rows = historial.map(h => ({
+      id:       h.id || crypto.randomUUID(),
+      user_id:  user.id,
+      date:     h.date,
+      tema_id:  h.temaId || null,
+      nombre:   h.nombre,
+      materia:  h.materia,
+      quality:  h.quality,
+      interval: h.interval
+    }))
+    const { error } = await supabase.from('historial').insert(rows)
+    if (error) { log('Error insertando historial: ' + error.message, 'err'); btn.disabled = false; return }
+    log(`✓ ${historial.length} entrada(s) de historial importada(s)`, 'ok')
+  }
+
+  log('¡Migración completada! Ya podés cerrar esta página y usar la app normalmente.', 'ok')
+  btn.textContent = 'Listo ✓'
+}
+</script>
+</body>
+</html>

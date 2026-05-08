@@ -59,6 +59,9 @@
         <button class="nav-item active" onclick="showTab('hoy',this)">
           <span class="ndot"></span>Hoy<span class="nbadge" id="nav-count">0</span>
         </button>
+        <button class="nav-item" onclick="showTab('progreso',this)">
+          <span class="ndot"></span>Progreso
+        </button>
         <button class="nav-item" onclick="showTab('temas',this)">
           <span class="ndot"></span>Temas
         </button>
@@ -98,6 +101,17 @@
             <div style="color:var(--ink3);font-family:var(--mono);font-size:13px;padding:20px 0">cargando...</div>
           </div>
         </div>
+      </div>
+
+      <!-- PROGRESO -->
+      <div id="tab-progreso" style="display:none;flex-direction:column;height:100%">
+        <div class="topbar">
+          <div>
+            <div class="page-title">Tu <em>progreso</em></div>
+            <div class="page-sub">Seguimiento de tu rendimiento de estudio</div>
+          </div>
+        </div>
+        <div class="content" id="progreso-content"></div>
       </div>
 
       <!-- TEMAS -->
@@ -243,6 +257,7 @@
 <script src="js/render.js"></script>
 <script src="js/things.js"></script>
 <script src="js/calendar.js"></script>
+<script src="js/stats.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

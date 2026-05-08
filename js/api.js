@@ -8,14 +8,13 @@ async function ghGet() {
   if (!r.ok) throw new Error('Error leyendo datos')
   const json = await r.json()
   fileSha = json.sha
-  // decodeURIComponent(escape(...)) revierte el encoding UTF-8 que btoa almacena como latin1
   const raw = decodeURIComponent(escape(atob(json.content.replace(/\n/g,''))))
   return JSON.parse(raw)
 }
 
 async function ghPut(data) {
   setSyncStatus('saving')
-  const url = `https://api.github.com/repos/${cfg.user}/${cfg.repo}/contents/${FILE_PATH}`
+  const url  = `https://api.github.com/repos/${cfg.user}/${cfg.repo}/contents/${FILE_PATH}`
   const body = { message: 'repaso: sync', content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))) }
   if (fileSha) body.sha = fileSha
   const r = await fetch(url, {
@@ -37,6 +36,8 @@ function setSyncStatus(s) {
 }
 
 async function persist() {
-  try { await ghPut({ temas }) }
+  // Mantener el historial en máx 500 entradas para no inflar data.json
+  const recortado = historial.slice(-500)
+  try { await ghPut({ temas, historial: recortado }) }
   catch(e) { toast('No se pudo guardar — revisá el token') }
 }

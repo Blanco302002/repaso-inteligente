@@ -4,7 +4,8 @@ async function bootApp() {
   setSyncStatus('saving')
   try {
     const data = await ghGet()
-    temas = data?.temas || []
+    temas     = data?.temas     || []
+    historial = data?.historial || []
   } catch(e) {
     toast('Error conectando con GitHub')
     setSyncStatus('err')
@@ -30,7 +31,7 @@ async function addTema() {
   })
   await persist()
   clearForm()
-  showTab('hoy', document.querySelectorAll('.nav-item')[0]) // índice 0 = Hoy
+  showTab('hoy', document.querySelector('.nav-item'))
   refresh()
   toast('Tema agregado')
 }
@@ -44,7 +45,19 @@ function clearForm() {
 async function rate(id, q) {
   const i = temas.findIndex(t => t.id === id)
   if (i < 0) return
-  const res = sm2(temas[i], q)
+  const t   = temas[i]
+  const res = sm2(t, q)
+
+  // Registrar en historial
+  historial.push({
+    date:    today(),
+    temaId:  id,
+    nombre:  t.nombre,
+    materia: t.materia,
+    quality: q,
+    interval: res.interval
+  })
+
   Object.assign(temas[i], res, { lastReview: today() })
   await persist()
   refresh()
@@ -68,15 +81,15 @@ async function toggleActive(id) {
 }
 
 function showTab(id, btn) {
-  ['hoy', 'temas', 'nuevo', 'things', 'calendario'].forEach(t => {
+  ['hoy', 'temas', 'progreso', 'calendario', 'nuevo', 'things'].forEach(t => {
     const el = document.getElementById('tab-' + t)
-    el.style.display = t === id ? 'flex' : 'none'
-    if (t === id) el.style.flexDirection = 'column'
+    if (el) { el.style.display = t === id ? 'flex' : 'none'; if (t === id) el.style.flexDirection = 'column' }
   })
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
   if (btn) btn.classList.add('active')
   if (id === 'things')     renderThings()
   if (id === 'calendario') renderCalendar()
+  if (id === 'progreso')   renderProgreso()
 }
 
 // ── EDITAR TEMA ──

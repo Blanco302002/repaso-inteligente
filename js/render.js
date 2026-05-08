@@ -4,8 +4,9 @@ function refresh() {
   renderAll()
   renderFilters()
   renderMats()
-  if (document.getElementById('tab-things').style.display !== 'none')     renderThings()
+  if (document.getElementById('tab-things').style.display     !== 'none') renderThings()
   if (document.getElementById('tab-calendario').style.display !== 'none') renderCalendar()
+  if (document.getElementById('tab-progreso').style.display   !== 'none') renderProgreso()
   document.getElementById('nav-count').textContent =
     temas.filter(t => t.active && t.nextReview <= today()).length
 }
@@ -33,18 +34,31 @@ function renderDue() {
   }
   el.innerHTML = due.map(t => {
     const [bg, fg] = matColor(t.materia)
+    const p0 = previewSm2(t, 0)
+    const p1 = previewSm2(t, 1)
+    const p2 = previewSm2(t, 2)
+    const lbl = n => n <= 1 ? 'mañana' : `en ${n} días`
     return `<div class="tema-card today">
       <div class="tema-main">
         <div class="tema-name">${esc(t.nombre)}</div>
         <div class="tema-meta">
           <span class="mpill" style="background:${bg};color:${fg}">${esc(t.materia)}</span>
-          <span class="tmeta">Int: ${t.interval}d · Rep: ${t.repetitions} · EF: ${t.ef}</span>
+          <span class="tmeta">Rep: ${t.repetitions} · EF: ${t.ef}</span>
         </div>
       </div>
       <div class="rate-row">
-        <button class="rb rb-0" onclick="rate('${t.id}',0)">Olvidé</button>
-        <button class="rb rb-1" onclick="rate('${t.id}',1)">Flojo</button>
-        <button class="rb rb-2" onclick="rate('${t.id}',2)">Bien</button>
+        <button class="rb" onclick="rate('${t.id}',0)">
+          <span class="rb-name">Olvidé</span>
+          <span class="rb-when">${lbl(p0)}</span>
+        </button>
+        <button class="rb" onclick="rate('${t.id}',1)">
+          <span class="rb-name">Flojo</span>
+          <span class="rb-when">${lbl(p1)}</span>
+        </button>
+        <button class="rb" onclick="rate('${t.id}',2)">
+          <span class="rb-name">Bien</span>
+          <span class="rb-when">${lbl(p2)}</span>
+        </button>
       </div>
     </div>`
   }).join('')

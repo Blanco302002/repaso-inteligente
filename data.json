@@ -21,6 +21,17 @@
       "nextReview": "2026-05-07",
       "lastReview": null,
       "active": true
+    },
+    {
+      "id": "45f8400f-5bfd-4722-b11a-85d0356f55ac",
+      "nombre": "Campo eléctrico",
+      "materia": "Física 2",
+      "ef": 2,
+      "interval": 3,
+      "repetitions": 0,
+      "nextReview": "2026-05-08",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

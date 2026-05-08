@@ -65,6 +65,17 @@
       "nextReview": "2026-05-11",
       "lastReview": null,
       "active": true
+    },
+    {
+      "id": "4079da17-95c1-4074-bd39-1bbef7d2139e",
+      "nombre": "Simplex y casos",
+      "materia": "Investigación operativa",
+      "ef": 2.5,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": "2026-05-08",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

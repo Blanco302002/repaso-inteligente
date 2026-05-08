@@ -15,11 +15,11 @@
       "id": "83187b62-2bbf-430c-8ffc-eb4d3dc40f28",
       "nombre": "Gestión de la configuración",
       "materia": "Ingeniería y calidad de SW",
-      "ef": 2.5,
+      "ef": 2.36,
       "interval": 1,
-      "repetitions": 0,
-      "nextReview": "2026-05-07",
-      "lastReview": null,
+      "repetitions": 1,
+      "nextReview": "2026-05-09",
+      "lastReview": "2026-05-08",
       "active": true
     },
     {

@@ -50,9 +50,9 @@
       "materia": "Ingeniería y calidad de SW",
       "ef": 1.6,
       "interval": 1,
-      "repetitions": 0,
-      "nextReview": "2026-05-08",
-      "lastReview": null,
+      "repetitions": 1,
+      "nextReview": "2026-05-09",
+      "lastReview": "2026-05-08",
       "active": true
     }
   ]

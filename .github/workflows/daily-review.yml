@@ -1,0 +1,56 @@
+name: Daily Review Email
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # 7:00 AM Argentina (UTC-3)
+  workflow_dispatch:        # permite dispararlo manualmente desde la pestaña Actions
+
+jobs:
+  send-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enviar repasos del día a Things
+        env:
+          GMAIL_USER:        ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          THINGS_EMAIL:      ${{ secrets.THINGS_EMAIL }}
+        run: |
+          python3 << 'EOF'
+          import json, datetime, smtplib, os, sys
+          from email.mime.text import MIMEText
+
+          with open('data.json', encoding='utf-8') as f:
+              data = json.load(f)
+
+          today = datetime.date.today().isoformat()
+          due   = [
+              t for t in data.get('temas', [])
+              if t.get('active') and t.get('nextReview', '') <= today
+          ]
+
+          if not due:
+              print('Sin temas pendientes hoy, no se envían correos.')
+              sys.exit(0)
+
+          gmail_user   = os.environ['GMAIL_USER']
+          gmail_pass   = os.environ['GMAIL_APP_PASSWORD']
+          things_email = os.environ['THINGS_EMAIL']
+
+          with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+              server.login(gmail_user, gmail_pass)
+              for tema in due:
+                  msg = MIMEText(
+                      f"Materia: {tema['materia']}\nRepaso del {today}",
+                      'plain', 'utf-8'
+                  )
+                  msg['Subject'] = f"📚 {tema['nombre']}"
+                  msg['From']    = gmail_user
+                  msg['To']      = things_email
+                  server.send_message(msg)
+                  print(f"✓ Enviado: {tema['nombre']}")
+
+          print(f"\nTotal: {len(due)} tema(s) enviado(s).")
+          EOF

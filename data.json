@@ -43,6 +43,17 @@
       "nextReview": "2026-05-08",
       "lastReview": null,
       "active": true
+    },
+    {
+      "id": "8e90cf56-859c-49df-a01c-0caa82ecf348",
+      "nombre": "Administración de proyectos",
+      "materia": "Ingeniería y calidad de SW",
+      "ef": 1.6,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": "2026-05-08",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

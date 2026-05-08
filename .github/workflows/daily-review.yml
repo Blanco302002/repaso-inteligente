@@ -10,26 +10,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Enviar repasos del día a Things
         env:
-          GMAIL_USER:        ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          THINGS_EMAIL:      ${{ secrets.THINGS_EMAIL }}
+          SUPABASE_URL:              ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_USER_ID:          ${{ secrets.SUPABASE_USER_ID }}
+          GMAIL_USER:                ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD:        ${{ secrets.GMAIL_APP_PASSWORD }}
+          THINGS_EMAIL:              ${{ secrets.THINGS_EMAIL }}
         run: |
           python3 << 'EOF'
           import json, datetime, smtplib, os, sys
+          from urllib.request import Request, urlopen
+          from urllib.error import HTTPError
           from email.mime.text import MIMEText
 
-          with open('data.json', encoding='utf-8') as f:
-              data = json.load(f)
+          supabase_url = os.environ['SUPABASE_URL'].rstrip('/')
+          service_key  = os.environ['SUPABASE_SERVICE_ROLE_KEY']
+          user_id      = os.environ['SUPABASE_USER_ID']
+          today        = datetime.date.today().isoformat()
 
-          today = datetime.date.today().isoformat()
-          due   = [
-              t for t in data.get('temas', [])
-              if t.get('active') and t.get('nextReview', '') <= today
-          ]
+          # Consultar temas pendientes desde Supabase (PostgREST)
+          url = (
+              f"{supabase_url}/rest/v1/temas"
+              f"?user_id=eq.{user_id}"
+              f"&active=eq.true"
+              f"&next_review=lte.{today}"
+              f"&select=nombre,materia"
+          )
+          req = Request(url, headers={
+              'apikey':        service_key,
+              'Authorization': f'Bearer {service_key}',
+              'Accept':        'application/json'
+          })
+          try:
+              with urlopen(req) as resp:
+                  due = json.loads(resp.read().decode())
+          except HTTPError as e:
+              print(f'ERROR consultando Supabase: {e.code} {e.reason}')
+              sys.exit(1)
 
           if not due:
               print('Sin temas pendientes hoy, no se envían correos.')
@@ -39,12 +58,9 @@ jobs:
           gmail_pass   = os.environ.get('GMAIL_APP_PASSWORD', '').strip()
           things_email = os.environ.get('THINGS_EMAIL', '').strip()
 
-          if not gmail_user:
-              print('ERROR: falta el secret GMAIL_USER'); sys.exit(1)
-          if not gmail_pass:
-              print('ERROR: falta el secret GMAIL_APP_PASSWORD'); sys.exit(1)
-          if not things_email:
-              print('ERROR: falta el secret THINGS_EMAIL'); sys.exit(1)
+          if not gmail_user:   print('ERROR: falta GMAIL_USER'); sys.exit(1)
+          if not gmail_pass:   print('ERROR: falta GMAIL_APP_PASSWORD'); sys.exit(1)
+          if not things_email: print('ERROR: falta THINGS_EMAIL'); sys.exit(1)
 
           with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
               server.login(gmail_user, gmail_pass)

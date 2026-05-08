@@ -10,39 +10,47 @@
 </head>
 <body>
 
-<!-- SETUP -->
-<div id="setup-screen">
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
   <div class="setup-card">
     <div class="setup-title">Repaso<br><em>inteligente</em></div>
-    <div class="setup-sub">CONFIGURACIÓN INICIAL · UNA SOLA VEZ</div>
 
-    <div class="setup-field">
-      <label>Tu usuario de GitHub</label>
-      <input type="text" id="cfg-user" placeholder="tu-usuario">
+    <div class="auth-tabs">
+      <button id="tab-login-btn" class="auth-tab active" onclick="switchAuthTab('login')">Iniciar sesión</button>
+      <button id="tab-signup-btn" class="auth-tab" onclick="switchAuthTab('signup')">Crear cuenta</button>
     </div>
-    <div class="setup-field">
-      <label>Nombre del repositorio</label>
-      <input type="text" id="cfg-repo" placeholder="repaso-inteligente">
-    </div>
-    <div class="setup-field">
-      <label>Personal Access Token</label>
-      <input type="password" id="cfg-token" placeholder="ghp_xxxxxxxxxxxx">
-      <div class="hint">
-        Generalo en <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a>
-        → "Fine-grained token" → solo permiso <strong>Contents: Read &amp; Write</strong> en este repo.
-        Se guarda solo en este navegador.
+
+    <!-- Login -->
+    <div id="auth-login-panel">
+      <div class="setup-field">
+        <label>Email</label>
+        <input type="email" id="auth-email" placeholder="tu@email.com"
+          onkeydown="if(event.key==='Enter')login()">
       </div>
-    </div>
-    <div class="setup-field">
-      <label>Correo de Things (opcional)</label>
-      <input type="email" id="cfg-things-email" placeholder="tudireccion@things.am">
-      <div class="hint">Things → Ajustes → Correo para Things. Podés configurarlo después también.</div>
+      <div class="setup-field">
+        <label>Contraseña</label>
+        <input type="password" id="auth-password" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter')login()">
+      </div>
+      <button class="setup-btn" onclick="login()">Entrar →</button>
     </div>
 
-    <button class="setup-btn" onclick="saveConfig()">Guardar y entrar →</button>
-    <div class="setup-note">
-      El token se guarda en localStorage de tu navegador.<br>
-      Nunca sale de tu dispositivo salvo para llamar a la API de GitHub.
+    <!-- Registro -->
+    <div id="auth-signup-panel" style="display:none">
+      <div class="setup-field">
+        <label>Email</label>
+        <input type="email" id="auth-email-reg" placeholder="tu@email.com">
+      </div>
+      <div class="setup-field">
+        <label>Contraseña</label>
+        <input type="password" id="auth-password-reg" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="setup-field">
+        <label>Confirmar contraseña</label>
+        <input type="password" id="auth-password-confirm" placeholder="Repetí la contraseña"
+          onkeydown="if(event.key==='Enter')signup()">
+      </div>
+      <button class="setup-btn" onclick="signup()">Crear cuenta →</button>
     </div>
   </div>
 </div>
@@ -80,6 +88,7 @@
           <span class="sync-dot" id="sync-dot"></span>
           <span id="sync-label">listo</span>
         </div>
+        <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
       </div>
     </aside>
 
@@ -250,8 +259,10 @@
 <div class="cal-tooltip" id="cal-tooltip"></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
 <script src="js/state.js"></script>
-<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/api.js"></script>
 <script src="js/sm2.js"></script>
 <script src="js/render.js"></script>

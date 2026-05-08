@@ -87,6 +87,17 @@
       "nextReview": "2026-05-08",
       "lastReview": null,
       "active": true
+    },
+    {
+      "id": "a938c9ac-9b16-47e2-9177-70c37088d347",
+      "nombre": "Método gráfico",
+      "materia": "Investigación operativa",
+      "ef": 2.5,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": "2026-05-08",
+      "lastReview": null,
+      "active": true
     }
   ]
 }

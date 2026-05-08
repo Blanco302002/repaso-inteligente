@@ -35,9 +35,16 @@ jobs:
               print('Sin temas pendientes hoy, no se envían correos.')
               sys.exit(0)
 
-          gmail_user   = os.environ['GMAIL_USER']
-          gmail_pass   = os.environ['GMAIL_APP_PASSWORD']
-          things_email = os.environ['THINGS_EMAIL']
+          gmail_user   = os.environ.get('GMAIL_USER', '').strip()
+          gmail_pass   = os.environ.get('GMAIL_APP_PASSWORD', '').strip()
+          things_email = os.environ.get('THINGS_EMAIL', '').strip()
+
+          if not gmail_user:
+              print('ERROR: falta el secret GMAIL_USER'); sys.exit(1)
+          if not gmail_pass:
+              print('ERROR: falta el secret GMAIL_APP_PASSWORD'); sys.exit(1)
+          if not things_email:
+              print('ERROR: falta el secret THINGS_EMAIL'); sys.exit(1)
 
           with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
               server.login(gmail_user, gmail_pass)

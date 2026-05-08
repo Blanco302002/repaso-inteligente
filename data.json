@@ -38,10 +38,10 @@
       "nombre": "Factores de Mantei, 10 razones proyecto fracasa, paradigmas de equipos",
       "materia": "Ingeniería y calidad de SW",
       "ef": 2,
-      "interval": 3,
-      "repetitions": 0,
-      "nextReview": "2026-05-08",
-      "lastReview": null,
+      "interval": 1,
+      "repetitions": 1,
+      "nextReview": "2026-05-09",
+      "lastReview": "2026-05-08",
       "active": true
     },
     {

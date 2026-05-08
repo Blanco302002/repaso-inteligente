@@ -3,17 +3,19 @@ const THINGS_EMAIL_KEY = 'ri_things_email'
 // cfg expone thingsEmail para compatibilidad con things.js
 let cfg = { thingsEmail: localStorage.getItem(THINGS_EMAIL_KEY) || '' }
 
-async function initAuth() {
-  const { data: { session } } = await supabase.auth.getSession()
-  if (session) {
-    await bootApp()
-  } else {
-    showAuthScreen()
-  }
+let booted = false
 
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN')  await bootApp()
-    if (event === 'SIGNED_OUT') showAuthScreen()
+async function initAuth() {
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT') {
+      booted = false
+      showAuthScreen()
+      return
+    }
+    if (session && !booted) {
+      booted = true
+      bootApp()
+    }
   })
 }
 

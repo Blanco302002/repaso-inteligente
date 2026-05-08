@@ -2,28 +2,16 @@ function renderProgreso() {
   const el = document.getElementById('progreso-content')
   if (!el) return
 
-  // ── Racha ──
-  const racha = calcRacha()
-
-  // ── Últimos 7 días (del historial) ──
-  const semana = ultimos7Dias()
-
-  // ── Stats de temas ──
-  const activos    = temas.filter(t => t.active)
-  const efProm     = activos.length
+  const racha    = calcRacha()
+  const activos  = temas.filter(t => t.active)
+  const efProm   = activos.length
     ? (activos.reduce((s, t) => s + t.ef, 0) / activos.length).toFixed(2)
     : '—'
-  const dificiles  = activos.filter(t => t.ef < 1.7).sort((a,b) => a.ef - b.ef)
-  const dominados  = activos.filter(t => t.ef >= 2.5 && t.repetitions >= 3).sort((a,b) => b.ef - a.ef)
-
-  // ── Por materia ──
-  const materias = [...new Set(activos.map(t => t.materia))].map(m => {
-    const grupo = activos.filter(t => t.materia === m)
-    const ef    = (grupo.reduce((s,t) => s+t.ef, 0) / grupo.length).toFixed(2)
-    return { m, n: grupo.length, ef }
-  }).sort((a,b) => a.ef - b.ef)
-
   const totalRep = historial.length
+  const semanaN  = ultimos7DiasCount()
+
+  const heat = buildHeatmap()
+  const pie  = buildPie()
 
   el.innerHTML = `
     <!-- Cards superiores -->
@@ -37,7 +25,7 @@ function renderProgreso() {
         <div class="stat-l">REPASOS TOTALES</div>
       </div>
       <div class="stat-card">
-        <div class="stat-n">${semana.reduce((s,d)=>s+d.n,0)}</div>
+        <div class="stat-n">${semanaN}</div>
         <div class="stat-l">ESTA SEMANA</div>
       </div>
       <div class="stat-card">
@@ -46,81 +34,114 @@ function renderProgreso() {
       </div>
     </div>
 
-    <!-- Actividad semanal -->
-    <div class="slabel" style="margin-bottom:12px">Actividad — últimos 7 días</div>
-    ${semana.every(d => d.n === 0)
-      ? `<div style="color:var(--ink3);font-family:var(--mono);font-size:13px;margin-bottom:24px">
-           Todavía no hay repasos registrados. ¡Estudiá algo hoy!
-         </div>`
-      : `<div class="week-chart">
-          ${semana.map(d => {
-            const max = Math.max(...semana.map(x=>x.n), 1)
-            const pct = Math.round((d.n / max) * 100)
-            return `<div class="week-col">
-              <div class="week-bar-wrap">
-                <div class="week-bar" style="height:${pct}%"></div>
-              </div>
-              <div class="week-label">${d.label}</div>
-              <div class="week-n">${d.n || ''}</div>
-            </div>`
-          }).join('')}
-        </div>`
-    }
+    <!-- Heatmap -->
+    <div class="slabel" style="margin-bottom:12px">Actividad — últimas 13 semanas</div>
+    <div class="heatmap-wrap">
+      <div class="heatmap-dows">
+        <span></span><span>L</span><span></span><span>M</span><span></span><span>V</span><span></span>
+      </div>
+      <div class="heatmap">
+        ${heat.html}
+      </div>
+    </div>
+    <div class="heatmap-legend">
+      <span>Menos</span>
+      <span class="heatmap-cell l0"></span>
+      <span class="heatmap-cell l1"></span>
+      <span class="heatmap-cell l2"></span>
+      <span class="heatmap-cell l3"></span>
+      <span class="heatmap-cell l4"></span>
+      <span>Más</span>
+    </div>
 
-    <!-- Por materia -->
-    ${materias.length ? `
-    <div class="slabel" style="margin-bottom:12px">Por materia</div>
-    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:24px">
-      ${materias.map(({m, n, ef}) => {
-        const [bg, fg] = matColor(m)
-        const pct = Math.round(((ef - 1.3) / (5 - 1.3)) * 100)
-        return `<div class="mat-stat-row">
-          <span class="mpill" style="background:${bg};color:${fg};min-width:120px;text-align:center">${esc(m)}</span>
-          <div class="mat-bar-track">
-            <div class="mat-bar-fill" style="width:${pct}%;background:${fg}"></div>
-          </div>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--ink3);white-space:nowrap">
-            ${n} tema${n!==1?'s':''} · EF ${ef}
-          </span>
-        </div>`
-      }).join('')}
-    </div>` : ''}
-
-    <!-- Necesitan atención -->
-    ${dificiles.length ? `
-    <div class="slabel" style="margin-bottom:10px">Necesitan atención <span style="font-weight:400;text-transform:none;letter-spacing:0">(EF < 1.7)</span></div>
-    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:24px">
-      ${dificiles.slice(0,5).map(t => {
-        const [bg, fg] = matColor(t.materia)
-        return `<div class="all-card" style="padding:10px 14px">
-          <div style="flex:1;min-width:0">
-            <div class="all-name" style="font-size:13px">${esc(t.nombre)}</div>
-            <div class="all-meta"><span class="mpill" style="background:${bg};color:${fg};font-size:10px;padding:1px 7px">${esc(t.materia)}</span></div>
-          </div>
-          <span class="bdge" style="background:var(--danger-bg);color:var(--danger)">EF ${t.ef}</span>
-        </div>`
-      }).join('')}
-    </div>` : ''}
-
-    <!-- Bien aprendidos -->
-    ${dominados.length ? `
-    <div class="slabel" style="margin-bottom:10px">Bien aprendidos <span style="font-weight:400;text-transform:none;letter-spacing:0">(EF ≥ 2.5 · +3 repasos)</span></div>
-    <div style="display:flex;flex-direction:column;gap:5px">
-      ${dominados.slice(0,5).map(t => {
-        const [bg, fg] = matColor(t.materia)
-        return `<div class="all-card" style="padding:10px 14px">
-          <div style="flex:1;min-width:0">
-            <div class="all-name" style="font-size:13px">${esc(t.nombre)}</div>
-            <div class="all-meta"><span class="mpill" style="background:${bg};color:${fg};font-size:10px;padding:1px 7px">${esc(t.materia)}</span></div>
-          </div>
-          <span class="bdge" style="background:var(--accent-bg);color:var(--accent2)">EF ${t.ef}</span>
-        </div>`
-      }).join('')}
+    <!-- Pie por materia -->
+    ${pie.total > 0 ? `
+    <div class="slabel" style="margin-top:32px;margin-bottom:12px">Temas por materia</div>
+    <div class="pie-wrap">
+      <svg class="pie-svg" viewBox="0 0 100 100">${pie.svg}</svg>
+      <div class="pie-legend">
+        ${pie.legend}
+      </div>
     </div>` : ''}
   `
 }
 
-// Racha: días consecutivos con al menos un repaso
+// ── HEATMAP ──
+function buildHeatmap() {
+  const today = new Date(); today.setHours(0,0,0,0)
+  const dow   = (today.getDay() + 6) % 7   // L=0 ... D=6
+  const start = new Date(today)
+  start.setDate(start.getDate() - dow - 12 * 7)
+
+  const cells = []
+  const cur   = new Date(start)
+  for (let i = 0; i < 13 * 7; i++) {
+    const dateStr  = fmt(cur)
+    const isFuture = cur > today
+    const count    = isFuture ? 0 : historial.filter(h => h.date === dateStr).length
+    cells.push({ dateStr, count, isFuture, dt: new Date(cur) })
+    cur.setDate(cur.getDate() + 1)
+  }
+
+  const html = cells.map(c => {
+    if (c.isFuture) return `<div class="heatmap-cell future"></div>`
+    const lvl   = c.count === 0 ? 0 : c.count <= 2 ? 1 : c.count <= 4 ? 2 : c.count <= 7 ? 3 : 4
+    const fecha = c.dt.toLocaleDateString('es-AR', { weekday:'short', day:'numeric', month:'short' })
+    const txt   = c.count === 0 ? 'sin repasos' : `${c.count} repaso${c.count!==1?'s':''}`
+    return `<div class="heatmap-cell l${lvl}" title="${fecha} · ${txt}"></div>`
+  }).join('')
+
+  return { html }
+}
+
+// ── PIE CHART ──
+function buildPie() {
+  const activos = temas.filter(t => t.active)
+  if (!activos.length) return { svg: '', legend: '', total: 0 }
+
+  const counts = {}
+  activos.forEach(t => { counts[t.materia] = (counts[t.materia] || 0) + 1 })
+  const total   = activos.length
+  const entries = Object.entries(counts).sort((a,b) => b[1] - a[1])
+
+  let angle = 0
+  const slicePaths = []
+  const legendRows = []
+
+  entries.forEach(([m, n]) => {
+    const [bg, fg] = matColor(m)
+    const pct      = n / total
+    const start    = angle
+    const end      = angle + pct * 2 * Math.PI
+    angle = end
+
+    const path = pieSlice(50, 50, 50, start, end, n === total)
+    slicePaths.push(`<path d="${path}" fill="${fg}" stroke="var(--paper)" stroke-width="0.5"/>`)
+    legendRows.push(`
+      <div class="pie-legend-row">
+        <span class="pie-dot" style="background:${fg}"></span>
+        <span class="pie-mat">${esc(m)}</span>
+        <span class="pie-n">${n} · ${Math.round(pct * 100)}%</span>
+      </div>`)
+  })
+
+  return { svg: slicePaths.join(''), legend: legendRows.join(''), total }
+}
+
+function pieSlice(cx, cy, r, startAngle, endAngle, isFull) {
+  if (isFull) {
+    return `M ${cx-r} ${cy} A ${r} ${r} 0 1 1 ${cx+r} ${cy} A ${r} ${r} 0 1 1 ${cx-r} ${cy} Z`
+  }
+  const x1 = cx + r * Math.sin(startAngle)
+  const y1 = cy - r * Math.cos(startAngle)
+  const x2 = cx + r * Math.sin(endAngle)
+  const y2 = cy - r * Math.cos(endAngle)
+  const large = endAngle - startAngle > Math.PI ? 1 : 0
+  return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`
+}
+
+// ── Helpers ──
+
 function calcRacha() {
   if (!historial.length) return 0
   const fechas = [...new Set(historial.map(h => h.date))].sort().reverse()
@@ -141,15 +162,11 @@ function restarDia(dateStr) {
   return fmt(dt)
 }
 
-// Últimos 7 días con conteo de repasos
-function ultimos7Dias() {
-  const dias = []
+function ultimos7DiasCount() {
+  let n = 0
   for (let i = 6; i >= 0; i--) {
     const dt = new Date(); dt.setDate(dt.getDate() - i)
-    const str   = fmt(dt)
-    const label = dt.toLocaleDateString('es-AR', { weekday: 'short' }).replace('.','').slice(0,3)
-    const n     = historial.filter(h => h.date === str).length
-    dias.push({ str, label, n })
+    n += historial.filter(h => h.date === fmt(dt)).length
   }
-  return dias
+  return n
 }

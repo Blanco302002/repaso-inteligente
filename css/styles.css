@@ -161,6 +161,25 @@ html,body{height:100%;font-family:var(--sans);background:var(--paper);color:var(
 .toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#faf8f5;padding:10px 18px;border-radius:var(--r);font-size:13px;font-family:var(--mono);opacity:0;transition:.3s;pointer-events:none;z-index:999}
 .toast.show{opacity:1}
 
+/* ── CALENDARIO ── */
+.cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.cal-month{font-family:var(--serif);font-size:22px;flex:1;text-align:center}
+.cal-nav-btn{border:1px solid var(--paper3);background:var(--paper2);border-radius:var(--r);padding:6px 14px;cursor:pointer;font-size:16px;color:var(--ink2);font-family:var(--mono)}
+.cal-nav-btn:hover{background:var(--paper3)}
+.cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.cal-dow{font-family:var(--mono);font-size:10px;color:var(--ink3);text-align:center;letter-spacing:.06em;padding:4px 0;text-transform:uppercase}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-cell{background:var(--paper);border:1px solid var(--paper3);border-radius:var(--r);padding:7px 8px;min-height:78px}
+.cal-cell.empty{background:transparent;border-color:transparent}
+.cal-cell.is-today{border-color:var(--accent);border-width:2px}
+.cal-cell.has-topics{background:var(--paper2)}
+.cal-cell.is-past.has-topics{opacity:.55}
+.cal-day-num{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-bottom:4px;line-height:1}
+.cal-cell.is-today .cal-day-num{color:var(--accent2);font-weight:500}
+.cal-topics{display:flex;flex-direction:column;gap:2px}
+.cal-topic-pill{font-size:10px;padding:2px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);cursor:default}
+.cal-topic-more{font-size:10px;color:var(--ink3);font-family:var(--mono);padding-left:2px}
+
 @media(max-width:600px){
   .shell{grid-template-columns:1fr;grid-template-rows:auto 1fr}
   .sidebar{flex-direction:row;height:auto}

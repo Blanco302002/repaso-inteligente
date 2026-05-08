@@ -68,6 +68,9 @@
         <button class="nav-item" onclick="showTab('things',this)">
           <span class="ndot"></span>Things
         </button>
+        <button class="nav-item" onclick="showTab('calendario',this)">
+          <span class="ndot"></span>Calendario
+        </button>
       </nav>
       <div class="sidebar-footer">
         <div class="sync-status">
@@ -174,6 +177,24 @@
         </div>
       </div>
 
+      <!-- CALENDARIO -->
+      <div id="tab-calendario" style="display:none;flex-direction:column;height:100%">
+        <div class="topbar">
+          <div>
+            <div class="page-title">Calendario <em>de repasos</em></div>
+            <div class="page-sub">Visualizá cuándo tenés que repasar cada tema</div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="calPrev()">←</button>
+            <div class="cal-month" id="cal-header"></div>
+            <button class="cal-nav-btn" onclick="calNext()">→</button>
+          </div>
+          <div id="cal-grid"></div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -220,6 +241,7 @@
 <script src="js/sm2.js"></script>
 <script src="js/render.js"></script>
 <script src="js/things.js"></script>
+<script src="js/calendar.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

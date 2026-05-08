@@ -10,6 +10,11 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 function fmt(d) { return d.toISOString().split('T')[0] }
+function fmtFull(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const s = new Date(y, m - 1, d).toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
 function today() { return fmt(new Date()) }
 function daysUntil(s) {
   const d=new Date(s), n=new Date()

@@ -68,14 +68,15 @@ async function toggleActive(id) {
 }
 
 function showTab(id, btn) {
-  ['hoy', 'temas', 'nuevo', 'things'].forEach(t => {
+  ['hoy', 'temas', 'nuevo', 'things', 'calendario'].forEach(t => {
     const el = document.getElementById('tab-' + t)
     el.style.display = t === id ? 'flex' : 'none'
     if (t === id) el.style.flexDirection = 'column'
   })
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
   if (btn) btn.classList.add('active')
-  if (id === 'things') renderThings()
+  if (id === 'things')     renderThings()
+  if (id === 'calendario') renderCalendar()
 }
 
 // ── EDITAR TEMA ──

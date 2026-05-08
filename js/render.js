@@ -4,7 +4,8 @@ function refresh() {
   renderAll()
   renderFilters()
   renderMats()
-  renderThings()
+  if (document.getElementById('tab-things').style.display !== 'none')     renderThings()
+  if (document.getElementById('tab-calendario').style.display !== 'none') renderCalendar()
   document.getElementById('nav-count').textContent =
     temas.filter(t => t.active && t.nextReview <= today()).length
 }
@@ -69,7 +70,7 @@ function renderAll() {
     return `<div class="all-card ${t.active ? '' : 'paused'}">
       <div style="flex:1;min-width:0">
         <div class="all-name">${esc(t.nombre)}</div>
-        <div class="all-meta"><span class="mpill" style="background:${bg};color:${fg};font-size:10px;padding:1px 7px">${esc(t.materia)}</span> · próximo: ${t.nextReview} · ef: ${t.ef}</div>
+        <div class="all-meta"><span class="mpill" style="background:${bg};color:${fg};font-size:10px;padding:1px 7px">${esc(t.materia)}</span> · ${fmtFull(t.nextReview)}</div>
       </div>
       <span class="bdge" style="background:${dbg};color:${dfg}">${dtxt}</span>
       <button class="cbtn" onclick="openEditModal('${t.id}')">Editar</button>

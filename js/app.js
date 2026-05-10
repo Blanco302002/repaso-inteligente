@@ -22,11 +22,17 @@ async function addTema() {
   const estado  = document.getElementById('inp-estado').value
   const fecha   = document.getElementById('inp-fecha').value || today()
   if (!nombre || !materia) { toast('Completá nombre y materia'); return }
-  const efMap  = { nuevo:2.5, flojo:1.6, regular:2.0, bien:2.8 }
-  const intMap = { nuevo:1,   flojo:1,   regular:3,   bien:7   }
+  // Estado inicial coordinado con el algoritmo nuevo:
+  //  nuevo   → mañana (rep 0)
+  //  flojo   → mañana, pero EF bajo (rep 0, ramp lenta)
+  //  regular → en 2 días (rep 1)
+  //  bien    → en 4 días (rep 2)
+  const efMap  = { nuevo:2.5, flojo:1.8, regular:2.3, bien:2.6 }
+  const intMap = { nuevo:1,   flojo:1,   regular:2,   bien:4   }
+  const repMap = { nuevo:0,   flojo:0,   regular:1,   bien:2   }
   temas.push({
     id: crypto.randomUUID(), nombre, materia,
-    ef: efMap[estado], interval: intMap[estado], repetitions: 0,
+    ef: efMap[estado], interval: intMap[estado], repetitions: repMap[estado],
     nextReview: fecha, lastReview: null, active: true
   })
   await persist()
@@ -61,8 +67,10 @@ async function rate(id, q) {
   Object.assign(temas[i], res, { lastReview: today() })
   await persist()
   refresh()
-  const msgs = ['Mañana lo repasamos', 'Intervalo reducido', `Próximo en ${res.interval} días`]
-  toast(msgs[q])
+  const msg = res.interval === 1
+    ? 'Mañana lo repasamos'
+    : `Próximo en ${res.interval} días`
+  toast(msg)
 }
 
 async function delTema(id) {
